@@ -205,12 +205,70 @@ function loadPhase2Models() {
   if (skyboxPhase1) { scene.remove(skyboxPhase1); skyboxPhase1 = null; }
   if (portalModel)  { scene.remove(portalModel);  portalModel = null; }
 
-  // Desactivar niebla
-  scene.fog = null;
+  // Niebla nocturna suave — da profundidad sin tapar los personajes
+  scene.fog = new THREE.FogExp2(0x05080f, 0.018);
 
-  // Pasto base — color tierra/café
+  // Skybox nocturno profundo con tono azul-índigo
+  const nightSkyGeo = new THREE.SphereGeometry(120, 32, 32);
+  const nightSkyMat = new THREE.MeshBasicMaterial({ color: 0x05080f, side: THREE.BackSide });
+  const nightSky = new THREE.Mesh(nightSkyGeo, nightSkyMat);
+  scene.add(nightSky);
+  phase2Objects.push(nightSky);
+
+  // Estrellas adicionales concentradas en la zona superior
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 600;
+  const starPos = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount; i++) {
+    starPos[i * 3]     = (Math.random() - 0.5) * 200;
+    starPos[i * 3 + 1] = Math.random() * 80 + 10; // Solo arriba
+    starPos[i * 3 + 2] = (Math.random() - 0.5) * 200;
+  }
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  const starMat = new THREE.PointsMaterial({ size: 0.25, color: 0xffffff, transparent: true, opacity: 0.85 });
+  const stars = new THREE.Points(starGeo, starMat);
+  scene.add(stars);
+  phase2Objects.push(stars);
+
+  // Luna llena
+  const moonGeo = new THREE.SphereGeometry(3.5, 16, 16);
+  const moonMat = new THREE.MeshBasicMaterial({ color: 0xf0e8c0 });
+  const moon = new THREE.Mesh(moonGeo, moonMat);
+  moon.position.set(-30, 50, -60);
+  scene.add(moon);
+  phase2Objects.push(moon);
+
+  // Luz de luna fría
+  const moonLight = new THREE.DirectionalLight(0x8899cc, 0.8);
+  moonLight.position.set(-30, 50, -60);
+  scene.add(moonLight);
+  phase2Objects.push(moonLight);
+
+  // Antorchas: luces cálidas en puntos estratégicos a los lados del área
+  const torchPositions: [number, number, number][] = [
+    [-5, -1.0, -7], [5, -1.0, -7],
+    [-5, -1.0, -11], [5, -1.0, -11],
+  ];
+  torchPositions.forEach((tp, idx) => {
+    const torchLight = new THREE.PointLight(0xff8833, 1.8, 12);
+    torchLight.position.set(tp[0], tp[1], tp[2]);
+    scene.add(torchLight);
+    phase2Objects.push(torchLight);
+    // Parpadeo de antorcha con gsap
+    gsap.to(torchLight, {
+      intensity: 1.2 + Math.random() * 0.8,
+      duration: 0.12 + idx * 0.07,
+      yoyo: true, repeat: -1, ease: 'sine.inOut'
+    });
+  });
+
+  // Ajustar luz ambiental para noche (más oscura y azulada)
+  ambientLight.color.set(0x1a2040);
+  ambientLight.intensity = 0.5;
+
+  // Pasto base — color tierra oscura nocturna
   const grassGeo = new THREE.PlaneGeometry(200, 200);
-  const grassMat = new THREE.MeshStandardMaterial({ color: 0x7a5c2e }); // Café tierra
+  const grassMat = new THREE.MeshStandardMaterial({ color: 0x3a3020 });
   const grass = new THREE.Mesh(grassGeo, grassMat);
   grass.rotation.x = -Math.PI / 2;
   grass.position.y = -2.2;
@@ -256,8 +314,8 @@ function loadPhase2Models() {
     scene.remove(nezukoBox!);
     phase2Objects.splice(phase2Objects.indexOf(nezukoBox!), 1);
     nezukoBox = gltf.scene;
-    nezukoBox.position.set(-3, 0.3, -7);   // Zona Hokage, ligeramente elevada
-    nezukoBox.scale.set(1.35, 1.35, 1.35); // 10% menos que 1.5
+    nezukoBox.position.set(-7, -0.5, -8.5);  // Flanco izquierdo, lejos de Narutos
+    nezukoBox.scale.set(1.08, 1.08, 1.08);   // 20% menos que 1.35
     scene.add(nezukoBox);
     phase2Objects.push(nezukoBox);
   });
@@ -266,25 +324,28 @@ function loadPhase2Models() {
     scene.remove(tojiStatic!);
     phase2Objects.splice(phase2Objects.indexOf(tojiStatic!), 1);
     tojiStatic = gltf.scene;
-    tojiStatic.position.set(3, 0.3, -7);  // Junto a Nezuko, zona Hokage
+    tojiStatic.position.set(7, -0.5, -8.5);  // Flanco derecho, bien separado
     tojiStatic.scale.set(5, 5, 5);
     scene.add(tojiStatic);
     phase2Objects.push(tojiStatic);
-    // Animación idle de Toji
+    // Animación idle de Toji — pequeño balanceo sin flotar
     gsap.to(tojiStatic.rotation, { y: Math.PI * 2, duration: 8, repeat: -1, ease: 'none' });
-    gsap.to(tojiStatic.position, { y: 0.8, duration: 1.5, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    gsap.to(tojiStatic.position, { y: 0.0, duration: 1.5, yoyo: true, repeat: -1, ease: 'sine.inOut' });
   });
 
-  // Narutos agrupados cerca de la zona del Hokage (fondo de la aldea), elevados sobre el piso
+  // Narutos en 2 filas limpias, Y=-0.5 (nivel visual del suelo Konoha)
+  // Espaciado mínimo 2.5u en X y 2u en Z — sin rozar edificios ni entre sí
+  // Fila delantera (z=-8.5): 4 narutos bien separados en X
+  // Fila trasera  (z=-11):   4 narutos escalonados
   const narutoPositions: [number, number, number][] = [
-    [ 0,  0.5, -9],  // Centro frente al monumento
-    [-2,  0.5, -9],  // Izquierda
-    [ 2,  0.5, -9],  // Derecha
-    [-1,  0.5, -11], // Segunda fila izq
-    [ 1,  0.5, -11], // Segunda fila der
-    [ 0,  0.5, -12], // Fondo centro
-    [-2.5,0.5, -7],  // Ligeramente más adelante izq
-    [ 2.5,0.5, -7],  // Ligeramente más adelante der
+    [-4.5, -0.5, -8.5],  // Fila 1 - extremo izq
+    [-1.5, -0.5, -8.5],  // Fila 1 - centro izq
+    [ 1.5, -0.5, -8.5],  // Fila 1 - centro der
+    [ 4.5, -0.5, -8.5],  // Fila 1 - extremo der
+    [-3.0, -0.5, -11.0], // Fila 2 - izq
+    [-0.5, -0.5, -11.0], // Fila 2 - centro izq
+    [ 2.0, -0.5, -11.0], // Fila 2 - centro der
+    [ 4.5, -0.5, -11.0], // Fila 2 - der
   ];
 
   narutoPositions.forEach((pos, i) => {
