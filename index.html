@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>¡Feliz Cumpleaños Nayleth!</title>
+    <meta name="description" content="Una experiencia 3D especial de cumpleaños al estilo anime para Nayleth." />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+
+    <!-- Canvas de Three.js (todo el fondo) -->
+    <div id="canvas-container"></div>
+
+    <!-- Capa de UI encima del canvas -->
+    <div id="ui-layer">
+
+      <!-- Pantalla de carga -->
+      <div id="loading" class="visible">
+        <h1>Cargando el Universo...</h1>
+      </div>
+
+      <!-- CTA del Portal -->
+      <div id="cta-text" class="hidden">
+        <h1>✨ Entra al Portal ✨</h1>
+        <p>Haz clic para comenzar tu aventura</p>
+      </div>
+
+      <!-- Modal de Personajes -->
+      <div id="modal-container" class="hidden">
+        <div class="modal-content">
+          <button id="close-modal">✕</button>
+          <h2 id="modal-title">Feliz Cumpleaños</h2>
+          <div id="modal-body"></div>
+          <div id="modal-footer"></div>
+        </div>
+      </div>
+
+      <!-- Instrucción de la Aldea -->
+      <div id="instruction-overlay" class="hidden">
+        👆 Haz clic en los Narutos que corren para ver sus mensajes<br/>
+        También puedes hacer clic en Toji ⚔️ y en la caja rosa 🌸
+      </div>
+
+      <!-- Manga Bubble (Historia) -->
+      <div id="story-text" class="manga-bubble" style="display:none;"></div>
+
+      <!-- Botón de Peligro -->
+      <button id="danger-btn" class="hidden">⚠️ PELIGRO: NO PRESIONAR ⚠️</button>
+
+      <!-- Cinemática Fullscreen (Pain / Gojo) -->
+      <div id="cinematic-container" class="hidden">
+        <div id="cinematic-iframe-wrapper"></div>
+      </div>
+
+      <!-- Flash de Explosión -->
+      <div id="explosion-flash" class="hidden"></div>
+
+      <!-- GIF Shinra Tensei -->
+      <div id="transition-gif-container" class="hidden">
+        <div class="tenor-gif-embed" data-postid="19640651" data-share-method="host"
+          data-aspect-ratio="1.77778" data-width="100%">
+          <a href="https://tenor.com/view/shinra-tensei-gif-19640651">Shinra Tensei GIF</a>
+          from <a href="https://tenor.com/search/shinra+tensei-gifs">Shinra Tensei GIFs</a>
+        </div>
+        <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+      </div>
+
+      <!-- Pantalla Final -->
+      <div id="final-screen" class="hidden">
+        <div class="final-modal">
+          <h1 class="neon-text">
+            ¡El Vacío Púrpura y el Shinra Tensei fueron demasiado! 💥<br/>
+            ¡Feliz Cumpleaños, Nayleth! 🎂🌸
+          </h1>
+          <p class="final-sub">
+            🐉 Haz clic en Kaido para escuchar su rugido<br/>
+            ⛵ El Sunny Go navega a tu lado en la escena de atrás
+          </p>
+          <button id="restart-btn">🔁 Repetir desde el inicio</button>
+        </div>
+      </div>
+
+    </div><!-- /ui-layer -->
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Kaido (Dragon form)
+* source:	https://sketchfab.com/3d-models/kaido-dragon-form-d448ffd652104bb396ec588bbca7ab49
+* author:	Cyrone™ (https://sketchfab.com/Cyrone)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Kaido (Dragon form)" (https://sketchfab.com/3d-models/kaido-dragon-form-d448ffd652104bb396ec588bbca7ab49) by Cyrone™ (https://sketchfab.com/Cyrone) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
